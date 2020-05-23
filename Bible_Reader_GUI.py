@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os,json
+import os,json, qdarkstyle
 import pandas as pd
 import jieba
 from jieba.analyse import ChineseAnalyzer
@@ -380,14 +380,17 @@ class MyMainWindow(QMainWindow):
         self.plainTextEdit.setStyleSheet(
                         """QPlainTextEdit {background-color: #FFFFFF;
                            color: #3300CC;}""")
+        # self.plainTextEdit.setStyleSheet(
+                        # """QPlainTextEdit {background-color: #FFFFFF;
+                        #    color: #ffc100;}""")
 
         self.plainTextEdit_scripture_explain.setStyleSheet(
                         """QPlainTextEdit {background-color: #FFFFFF;
                            color: #6600CC;}""")
         self.setWindowTitle('Bible Reader')
-        sock = urllib.request.urlopen("http://mobile.chinesebibleonline.com/bible")  
-        self.html_overview = etree.HTML(sock.read())
-        sock.close()
+        # sock = urllib.request.urlopen("http://mobile.chinesebibleonline.com/bible")  
+        # self.html_overview = etree.HTML(sock.read())
+        # sock.close()
 
         url_overview_ds = "https://www.24en.com/novel/religion/streams-in-the-desert.html"
         sock = urllib.request.urlopen(url_overview_ds)
@@ -562,7 +565,7 @@ class MyMainWindow(QMainWindow):
 
             self.textBrowser_search_results.clear()
             cursor = self.textBrowser_search_results.textCursor()
-            cursor.insertHtml('''<p><span style="color: blue;">{} <br></span>'''.format(" "))
+            cursor.insertHtml('''<p><span style="color: #ffc100;">{} <br></span>'''.format(" "))
             self.textBrowser_search_results.setText(''.join(search_results)) 
 
     def search_bible_english(self):
@@ -604,7 +607,7 @@ class MyMainWindow(QMainWindow):
                                        self.bible_english_json[hit_book[i]][hit_chapter[i]][hit_verse[i]]))
             self.textBrowser_search_results.clear()
             cursor = self.textBrowser_search_results.textCursor()
-            cursor.insertHtml('''<p><span style="color: blue;">{} <br></span>'''.format(" "))
+            cursor.insertHtml('''<p><span style="color: #ffc100;">{} <br></span>'''.format(" "))
             self.textBrowser_search_results.setText(''.join(search_results)) 
 
     def check_read_or_not(self):
@@ -613,16 +616,16 @@ class MyMainWindow(QMainWindow):
         with open(os.path.join(msg_path,'read_or_not.txt'),'r') as f:
             date = f.readlines()[0]
             if date.rstrip()=='{}.{}.{}'.format(d,m,y):
-                self.label_check.setText('今日已读')
+                self.pushButton_check.setText('今日已读')
             else:
-                self.label_check.setText('今日未读')
+                self.pushButton_check.setText('今日打卡')
 
     def update_check_read(self):
         today = datetime.date.today()
         y,m,d = today.year, today.month, today.day
         with open(os.path.join(msg_path,'read_or_not.txt'),'w') as f:
             f.write('{}.{}.{}'.format(d,m,y))
-            self.label_check.setText('今日已读')
+            self.pushButton_check.setText('今日已读')
 
 
     def load_extra_chapter_number(self):
@@ -734,7 +737,7 @@ class MyMainWindow(QMainWindow):
 
         self.textBrowser_bible.clear()
         cursor = self.textBrowser_bible.textCursor()
-        cursor.insertHtml('''<p><span style="color: blue;">{} <br></span>'''.format(" "))
+        cursor.insertHtml('''<p><span style="color: #ffc100;">{} <br></span>'''.format(" "))
         self.textBrowser_bible.setText('\n'.join(chapter_content_all)) 
         
 
@@ -822,7 +825,7 @@ class MyMainWindow(QMainWindow):
     def get_scripture_for_today_local_disk(self):
         self.textBrowser_bible.clear()
         cursor = self.textBrowser_bible.textCursor()
-        cursor.insertHtml('''<p><span style="color: blue;">{} <br></span>'''.format(" "))
+        cursor.insertHtml('''<p><span style="color: #ffc100;">{} <br></span>'''.format(" "))
         #setup for reading from beginning to end mode
         #are you in new testimony today?
         in_new_testimony = (self.days_elapsed*self.spinBox_old.value()+self.spinBox_more_old.value()-self.old_testimony)>=0
@@ -1259,10 +1262,21 @@ class MyMainWindow(QMainWindow):
         else:
             pass
 
+    def closeEvent(self, event):
+        quit_msg = "Are you sure you want to exit the program? If yes, the notes will be appended!"
+        reply = QMessageBox.question(self, 'Message', 
+                        quit_msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.save_notes_json_append()
+            event.accept()
+        else:
+            event.ignore()
+
 if __name__ == "__main__":
     # QApplication.setStyle("windows")
     QApplication.setStyle("fusion")
     app = QApplication(sys.argv)
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     myWin = MyMainWindow()
     myWin.show()
     sys.exit(app.exec_())

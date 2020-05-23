@@ -229,6 +229,24 @@
           </layout>
          </widget>
         </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>读经进度</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QProgressBar" name="progressBar">
+            <property name="value">
+             <number>24</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
        </layout>
       </widget>
       <widget class="QFrame" name="frame_2">
@@ -322,31 +340,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_check">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <property name="text">
-             <string>本日未读</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>开始日期</string>
+             <string>读经开始于</string>
             </property>
            </widget>
           </item>
@@ -414,13 +410,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QProgressBar" name="progressBar">
-            <property name="value">
-             <number>24</number>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>
@@ -448,6 +437,18 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_more_old">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="minimum">
              <number>-100</number>
             </property>
@@ -462,6 +463,18 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_more_new">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="minimum">
              <number>-100</number>
             </property>
@@ -476,9 +489,15 @@
           </item>
           <item>
            <widget class="QComboBox" name="comboBox_book">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
-              <width>140</width>
+              <width>100</width>
               <height>0</height>
              </size>
             </property>
@@ -508,7 +527,7 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>60</width>
+              <width>30</width>
               <height>16777215</height>
              </size>
             </property>
@@ -534,7 +553,7 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>60</width>
+              <width>30</width>
               <height>16777215</height>
              </size>
             </property>
@@ -553,14 +572,14 @@
           <item>
            <widget class="QLabel" name="label_20">
             <property name="text">
-             <string>英文版本选择</string>
+             <string>英文版本</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QComboBox" name="comboBox_bible_version">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -681,7 +700,7 @@
            </font>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
