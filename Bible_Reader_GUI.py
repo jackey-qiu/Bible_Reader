@@ -19,7 +19,6 @@ import numpy as np
 import calendar
 import smtplib
 from email.mime.text import MIMEText
-from wxpy import *
 import sys,os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsScene, QPlainTextEdit, QMessageBox
 from PyQt5.QtCore import QDate, Qt
@@ -27,6 +26,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
 from util import *
 from random import randint
+from langconv import *
+convert = Converter('zh-hans').convert
 try:
     from . import locate_path
 except:
@@ -170,8 +171,6 @@ bible_books = \
  '约翰三书',
  '犹大书',
  '启示录']
-
-
 
 def search_bible(file = 'chinese_bible.json',phrase = ''):
     hit_book, hit_verse, hit_chapter = [],[],[]
@@ -461,6 +460,7 @@ class MyMainWindow(QMainWindow):
         self.pushButton_show_notes.clicked.connect(self.show_note_panel)
         self.pushButton_hide_notes.clicked.connect(self.hide_note_panel)
         self.pushButton_load_json.clicked.connect(self.load_json)
+        self.pushButton_save_json.clicked.connect(self.save_json)
         self.pushButton_next_chapter.clicked.connect(self.go_to_next_chapter)
         self.pushButton_last_chapter.clicked.connect(self.go_to_last_chapter)
 
@@ -475,6 +475,22 @@ class MyMainWindow(QMainWindow):
             self.lineEdit_book_title.setText(fileName)
             self.comboBox_book_chapter.clear()
             self.comboBox_book_chapter.addItems(sorted(list(self.scripture_explain.keys())))
+
+    def save_json(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save file as", "", "json file (*.json);;all files (*.*)")
+        fileName = convert(fileName)
+        if fileName:
+            with open(fileName,'w') as f:
+                json.dump({convert(os.path.basename(fileName)):convert(self.plainTextEdit_scripture_explain.toPlainText())},f)
+            with open(fileName,'r') as f:
+                self.scripture_explain = json.load(f)
+            self.lineEdit_book_title.setText(fileName)
+            self.comboBox_book_chapter.clear()
+            self.comboBox_book_chapter.addItems(sorted(list(self.scripture_explain.keys())))
+            self.statusbar.clearMessage()
+            self.statusbar.showMessage("新的json文件保存成功！")
 
     def set_book_chapter(self):
         current_text = self.comboBox_book_chapter.currentText()
@@ -1263,11 +1279,11 @@ class MyMainWindow(QMainWindow):
             pass
 
     def closeEvent(self, event):
-        quit_msg = "Are you sure you want to exit the program? If yes, the notes will be appended!"
+        quit_msg = "Are you sure you want to exit the program? If yes, the notes will be overwritten!"
         reply = QMessageBox.question(self, 'Message', 
                         quit_msg, QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.save_notes_json_append()
+            self.save_notes_json_overwrite()
             event.accept()
         else:
             event.ignore()
