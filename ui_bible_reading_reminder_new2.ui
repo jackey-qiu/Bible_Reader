@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1440</width>
-    <height>830</height>
+    <height>821</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -693,6 +693,12 @@
         </item>
         <item>
          <widget class="QTabWidget" name="tabWidget">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>400</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <family>.SF NS Text</family>
@@ -825,6 +831,12 @@ p, li { white-space: pre-wrap; }
             </item>
             <item>
              <widget class="QPlainTextEdit" name="plainTextEdit_scripture_explain">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>320</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <family>Kai</family>
@@ -902,14 +914,14 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QPushButton" name="pushButton_show_notes">
             <property name="text">
-             <string>显示笔记</string>
+             <string>隐藏笔记</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_hide_notes">
+           <widget class="QPushButton" name="pushButton_show_scripture">
             <property name="text">
-             <string>隐藏笔记</string>
+             <string>隐藏经文</string>
             </property>
            </widget>
           </item>
@@ -917,11 +929,17 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QWidget" name="widget_notes" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>

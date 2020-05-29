@@ -458,7 +458,7 @@ class MyMainWindow(QMainWindow):
         # self.comboBox_plan.currentIndexChanged.connect(self.update_reading_plan)
         self.comboBox_bible_version.currentIndexChanged.connect(self.update_bible_version)
         self.pushButton_show_notes.clicked.connect(self.show_note_panel)
-        self.pushButton_hide_notes.clicked.connect(self.hide_note_panel)
+        self.pushButton_show_scripture.clicked.connect(self.show_scripture_panel)
         self.pushButton_load_json.clicked.connect(self.load_json)
         self.pushButton_save_json.clicked.connect(self.save_json)
         self.pushButton_next_chapter.clicked.connect(self.go_to_next_chapter)
@@ -515,10 +515,20 @@ class MyMainWindow(QMainWindow):
             self.set_book_chapter()
 
     def show_note_panel(self):
-        self.widget_notes.show()
+        if self.pushButton_show_notes.text()=='显示笔记':
+            self.pushButton_show_notes.setText('隐藏笔记')
+            self.widget_notes.show()
+        else:
+            self.pushButton_show_notes.setText('显示笔记')
+            self.widget_notes.hide()
 
-    def hide_note_panel(self):
-        self.widget_notes.hide()
+    def show_scripture_panel(self):
+        if self.pushButton_show_scripture.text()=='显示经文':
+            self.pushButton_show_scripture.setText('隐藏经文')
+            self.tabWidget.setVisible(True)
+        else:
+            self.pushButton_show_scripture.setText('显示经文')
+            self.tabWidget.setVisible(False)
 
     def update_bible_version(self):
         bible_version = self.comboBox_bible_version.currentText()
@@ -1131,6 +1141,8 @@ class MyMainWindow(QMainWindow):
         start_year = int(datetime.date.today().year)
         start = datetime.date(start_year, start_month, start_date)
         self.days_elapsed  = (datetime.date.today()-start).days
+        self.calendarWidget.setSelectedDate(QDate(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
+        self.load_specified_notes_json(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day)
         #count_down =  int(self.total_chapter/(int(self.spinBox_old.value())+int(self.spinBox_new.value()))) - (datetime.date.today()-start).days
         #self.lineEdit_count_down.setText(str(count_down))
         #total_days = self.total_chapter/(int(self.spinBox_old.value())+int(self.spinBox_new.value()))
