@@ -390,17 +390,23 @@ class MyMainWindow(QMainWindow):
         # sock = urllib.request.urlopen("http://mobile.chinesebibleonline.com/bible")  
         # self.html_overview = etree.HTML(sock.read())
         # sock.close()
+        try:
+            url_overview_ds = "https://www.24en.com/novel/religion/streams-in-the-desert.html"
+            sock = urllib.request.urlopen(url_overview_ds)
+            self.html_overview_ds = etree.HTML(sock.read())
+            sock.close()
+        except:
+            self.html_overview_ds = 'error'
 
-        url_overview_ds = "https://www.24en.com/novel/religion/streams-in-the-desert.html"
-        sock = urllib.request.urlopen(url_overview_ds)
-        self.html_overview_ds = etree.HTML(sock.read())
-        sock.close()
-
-        url_scripture = "http://cclw.net/resources/shenjinjinju.htm"
-        sock = urllib.request.urlopen(url_scripture)
-        self.html_scripture = etree.HTML(sock.read())
-        sock.close()
-        self.scripture_list = self.html_scripture.xpath("/html/body/center/table/tbody/tr/td/ol/p/text()")
+        try:
+            url_scripture = "http://cclw.net/resources/shenjinjinju.htm"
+            sock = urllib.request.urlopen(url_scripture)
+            self.html_scripture = etree.HTML(sock.read())
+            sock.close()
+            self.scripture_list = self.html_scripture.xpath("/html/body/center/table/tbody/tr/td/ol/p/text()")
+        except:
+            self.html_scripture = 'error'
+            self.scripture_list = 'error'
         self.get_golden_scripture()
 
         self.bible_chinese_json = ''
@@ -422,10 +428,7 @@ class MyMainWindow(QMainWindow):
         self.comboBox_book.addItems(bible_books)
         # self.update_reading_plan()
         self.update_count_down_time()
-        try:
-            self.get_spring_desert_article()
-        except:
-            pass
+        self.get_spring_desert_article()
         # self.load_extra_chapter_number()
         self.check_read_or_not()
         self.get_scripture_for_today_local_disk()
@@ -536,9 +539,12 @@ class MyMainWindow(QMainWindow):
             self.bible_english_json = json.load(f)
 
     def get_golden_scripture(self):
-        index1,index2 = randint(0,len(self.scripture_list)),randint(0,len(self.scripture_list))
-        s1,s2 = self.scripture_list[index1].rsplit(), self.scripture_list[index2].rsplit()
-        s1,s2 = "".join(s1[1:]),"".join(s2[1:])
+        if self.scripture_list != 'error':
+            index1,index2 = randint(0,len(self.scripture_list)),randint(0,len(self.scripture_list))
+            s1,s2 = self.scripture_list[index1].rsplit(), self.scripture_list[index2].rsplit()
+            s1,s2 = "".join(s1[1:]),"".join(s2[1:])
+        else:
+            s1, s2 = "Network issue!", "Check you have internet connection, and try again!"
         self.textBrowser_scripture.clear()
         cursor = self.textBrowser_scripture.textCursor()
         cursor.insertHtml('''<p><span style="color: red;">{} <br></span>'''.format(" "))
@@ -1101,16 +1107,20 @@ class MyMainWindow(QMainWindow):
     def get_spring_desert_article(self):
         selected_date = self.calendarWidget.selectedDate().toPyDate()
         y,m,d = selected_date.year, selected_date.month, selected_date.day
-        url = self.html_overview_ds.xpath('/html/body/div[2]/div[4]/div[1]/div[2]/div[{}]/ul/li/a/@href'.format(int(m)*2))[int(d)-1]
-        sock = urllib.request.urlopen(url)
-        html = etree.HTML(sock.read())
-        sock.close()
-        content = html.xpath('/html/body/div[2]/div[4]/div/div[4]/div[2]/p/text()')
+        if self.html_overview_ds != "error":
+            url = self.html_overview_ds.xpath('/html/body/div[2]/div[4]/div[1]/div[2]/div[{}]/ul/li/a/@href'.format(int(m)*2))[int(d)-1]
+            sock = urllib.request.urlopen(url)
+            html = etree.HTML(sock.read())
+            sock.close()
+            content = html.xpath('/html/body/div[2]/div[4]/div/div[4]/div[2]/p/text()')
+        else:
+            content = ['Network issue!','Check your internet connection and try again!']
         self.textBrowser.clear()
         for each in content:
             each=each+'\n'
             cursor = self.textBrowser.textCursor()
             cursor.insertHtml('''<p><span style="color: green;">{} <br></span>'''.format(each))
+        self.pushButton_before.click()
         # self.textBrowser.setText('\n'.join(content))
 
     #not in use any more
