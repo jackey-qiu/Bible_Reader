@@ -428,7 +428,10 @@ class MyMainWindow(QMainWindow):
         self.comboBox_book.addItems(bible_books)
         # self.update_reading_plan()
         self.update_count_down_time()
-        self.get_spring_desert_article()
+        try:
+            self.get_spring_desert_article()
+        except:
+            pass
         # self.load_extra_chapter_number()
         self.check_read_or_not()
         self.get_scripture_for_today_local_disk()
@@ -540,9 +543,12 @@ class MyMainWindow(QMainWindow):
 
     def get_golden_scripture(self):
         if self.scripture_list != 'error':
-            index1,index2 = randint(0,len(self.scripture_list)),randint(0,len(self.scripture_list))
-            s1,s2 = self.scripture_list[index1].rsplit(), self.scripture_list[index2].rsplit()
-            s1,s2 = "".join(s1[1:]),"".join(s2[1:])
+            try:
+                index1,index2 = randint(0,len(self.scripture_list)),randint(0,len(self.scripture_list))
+                s1,s2 = self.scripture_list[index1].rsplit(), self.scripture_list[index2].rsplit()
+                s1,s2 = "".join(s1[1:]),"".join(s2[1:])
+            except:
+                s1,s2 = '',''
         else:
             s1, s2 = "Network issue!", "Check you have internet connection, and try again!"
         self.textBrowser_scripture.clear()
@@ -1173,7 +1179,9 @@ class MyMainWindow(QMainWindow):
 
     def save_notes(self):
         notes_path = os.path.join(msg_path,'Bible_reader_notes.txt')
-        y,m,d = datetime.date.today().year, datetime.date.today().month, datetime.date.today().day
+        # y,m,d = datetime.date.today().year, datetime.date.today().month, datetime.date.today().day
+        date=self.calendarWidget.selectedDate().toPyDate()
+        y,m,d = date.year, date.month, date.day
         if self.plainTextEdit.toPlainText()!='':
             if not os.path.exists(notes_path):
                 with open(notes_path,'w') as f:
@@ -1192,7 +1200,9 @@ class MyMainWindow(QMainWindow):
 
     def save_notes_json_overwrite(self):
         notes_path = os.path.join(msg_path,'Bible_reader_notes.json')
-        y,m,d = datetime.date.today().year, datetime.date.today().month, datetime.date.today().day
+        # y,m,d = datetime.date.today().year, datetime.date.today().month, datetime.date.today().day
+        date=self.calendarWidget.selectedDate().toPyDate()
+        y,m,d = date.year, date.month, date.day
         notes_dict = {}
         if self.plainTextEdit.toPlainText()!='':
             if not os.path.exists(notes_path):
@@ -1214,7 +1224,9 @@ class MyMainWindow(QMainWindow):
 
     def save_notes_json_append(self):
         notes_path = os.path.join(msg_path,'Bible_reader_notes.json')
-        y,m,d = datetime.date.today().year, datetime.date.today().month, datetime.date.today().day
+        #y,m,d = datetime.date.today().year, datetime.date.today().month, datetime.date.today().day
+        date=self.calendarWidget.selectedDate().toPyDate()
+        y,m,d = date.year, date.month, date.day
         notes_dict = {}
         if self.plainTextEdit.toPlainText()!='':
             if not os.path.exists(notes_path):
@@ -1260,7 +1272,7 @@ class MyMainWindow(QMainWindow):
                     content_together = [notes_all["{}月{}月{}日".format(y,m,d)]]
                     self.plainTextEdit.setPlainText("".join(content_together))
                 else:
-                    pass
+                    self.plainTextEdit.setPlainText("")
         else:
             pass
 
@@ -1311,8 +1323,8 @@ class MyMainWindow(QMainWindow):
             event.ignore()
 
 if __name__ == "__main__":
-    # QApplication.setStyle("windows")
-    QApplication.setStyle("fusion")
+    QApplication.setStyle("windows")
+    # QApplication.setStyle("fusion")
     app = QApplication(sys.argv)
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     myWin = MyMainWindow()
