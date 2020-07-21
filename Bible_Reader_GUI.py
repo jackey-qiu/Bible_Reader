@@ -9,7 +9,7 @@ from whoosh.qparser import QueryParser
 from whoosh.fields import Schema
 from whoosh import fields
 from whoosh.index import open_dir
-import urllib,random
+import urllib,random,ssl
 from urllib.parse import quote
 from urllib.request import Request
 import string
