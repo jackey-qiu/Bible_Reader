@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1440</width>
-    <height>796</height>
+    <height>821</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -191,7 +191,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTextBrowser" name="textBrowser">
+         <widget class="QPlainTextEdit" name="plainTextEdit_desert">
           <property name="font">
            <font>
             <family>Kai</family>

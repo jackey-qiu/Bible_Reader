@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os,json, qdarkstyle
+#The following three lines are necessary as a detoure to the incompatibiltiy of Qt5 APP showing in Big Sur OS
+#This solution seems non-sense, since the matplotlib is not used in the app.
+#But if these lines are removed, the app GUI is not gonna pop up.
+#This situation may change in the future.
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("TkAgg")
 import pandas as pd
 import jieba
 from jieba.analyse import ChineseAnalyzer
@@ -379,9 +386,9 @@ class MyMainWindow(QMainWindow):
         self.plainTextEdit.setStyleSheet(
                         """QPlainTextEdit {background-color: #FFFFFF;
                            color: #3300CC;}""")
-        # self.plainTextEdit.setStyleSheet(
-                        # """QPlainTextEdit {background-color: #FFFFFF;
-                        #    color: #ffc100;}""")
+        self.plainTextEdit_desert.setStyleSheet(
+                        """QPlainTextEdit {
+                           color: green;}""")
 
         self.plainTextEdit_scripture_explain.setStyleSheet(
                         """QPlainTextEdit {background-color: #FFFFFF;
@@ -390,6 +397,10 @@ class MyMainWindow(QMainWindow):
         # sock = urllib.request.urlopen("http://mobile.chinesebibleonline.com/bible")  
         # self.html_overview = etree.HTML(sock.read())
         # sock.close()
+        self.html_overview_ds = 'error'
+        with open('/Users/canrong/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
+            self.desert_scripture = json.load(f)
+        '''
         try:
             url_overview_ds = "https://www.24en.com/novel/religion/streams-in-the-desert.html"
             sock = urllib.request.urlopen(url_overview_ds)
@@ -397,6 +408,9 @@ class MyMainWindow(QMainWindow):
             sock.close()
         except:
             self.html_overview_ds = 'error'
+            with open('/Users/canrong/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
+                self.desert_scripture = json.load(f)
+        '''
 
         try:
             url_scripture = "http://cclw.net/resources/shenjinjinju.htm"
@@ -892,10 +906,10 @@ class MyMainWindow(QMainWindow):
         #update reading status now
         if self.checkBox_order.isChecked():
             self.lineEdit_count_down.setText(str(num_days_left_all))
-            self.progressBar.setValue(100*(1-num_days_left_all/(self.days_elapsed+num_days_left_all)))
+            self.progressBar.setValue(int(100*(1-num_days_left_all/(self.days_elapsed+num_days_left_all))))
         else:
             self.lineEdit_count_down.setText(str(num_days_left_all_together))
-            self.progressBar.setValue(100*(1-num_days_left_all_together/(self.days_elapsed+num_days_left_all_together)))
+            self.progressBar.setValue(int(100*(1-num_days_left_all_together/(self.days_elapsed+num_days_left_all_together))))
 
         old_testimony_content_cn = []
         new_testimony_content_cn = []
@@ -1113,6 +1127,11 @@ class MyMainWindow(QMainWindow):
     def get_spring_desert_article(self):
         selected_date = self.calendarWidget.selectedDate().toPyDate()
         y,m,d = selected_date.year, selected_date.month, selected_date.day
+        first_data_of_year = datetime.date(y,1,1)
+        which_day_of_today = (selected_date - first_data_of_year).days
+        content = [self.desert_scripture['{}_cn'.format(which_day_of_today)],self.desert_scripture['{}_eng'.format(which_day_of_today)]]
+
+        '''
         if self.html_overview_ds != "error":
             url = self.html_overview_ds.xpath('/html/body/div[2]/div[4]/div[1]/div[2]/div[{}]/ul/li/a/@href'.format(int(m)*2))[int(d)-1]
             sock = urllib.request.urlopen(url)
@@ -1120,12 +1139,16 @@ class MyMainWindow(QMainWindow):
             sock.close()
             content = html.xpath('/html/body/div[2]/div[4]/div/div[4]/div[2]/p/text()')
         else:
-            content = ['Network issue!','Check your internet connection and try again!']
-        self.textBrowser.clear()
+            content = [self.desert_scripture['{}_cn'.format(which_day_of_today)],self.desert_scripture['{}_eng'.format(which_day_of_today)]]
+        '''
+        self.plainTextEdit_desert.clear()
+        self.plainTextEdit_desert.setPlainText('\n'.join(content))
+        """
         for each in content:
-            each=each+'\n'
+            each=each+'\n\n\n'
             cursor = self.textBrowser.textCursor()
             cursor.insertHtml('''<p><span style="color: green;">{} <br></span>'''.format(each))
+        """
         self.pushButton_before.click()
         # self.textBrowser.setText('\n'.join(content))
 
