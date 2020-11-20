@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import os,json, qdarkstyle
+from pathlib import Path
 #The following three lines are necessary as a detoure to the incompatibiltiy of Qt5 APP showing in Big Sur OS
 #This solution seems non-sense, since the matplotlib is not used in the app.
 #But if these lines are removed, the app GUI is not gonna pop up.
@@ -28,7 +30,8 @@ import smtplib
 from email.mime.text import MIMEText
 import sys,os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsScene, QPlainTextEdit, QMessageBox
-from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaPlaylist
+from PyQt5.QtCore import QDate, Qt, QAbstractListModel,QUrl
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
 from util import *
@@ -39,6 +42,7 @@ try:
     from . import locate_path
 except:
     import locate_path
+import youtube_dl
 msg_path = locate_path.module_path_locator()
 analyzer = ChineseAnalyzer()
 print(msg_path)
@@ -178,6 +182,42 @@ bible_books = \
  '约翰三书',
  '犹大书',
  '启示录']
+
+def error_pop_up(msg_text = 'error', window_title = ['Error','Information','Warning'][0]):
+    msg = QMessageBox()
+    if window_title == 'Error':
+        msg.setIcon(QMessageBox.Critical)
+    elif window_title == 'Warning':
+        msg.setIcon(QMessageBox.Warning)
+    else:
+        msg.setIcon(QMessageBox.Information)
+
+    msg.setText(msg_text)
+    # msg.setInformativeText('More information')
+    msg.setWindowTitle(window_title)
+    msg.exec_()
+
+def hhmmss(ms):
+    # s = 1000
+    # m = 60000
+    # h = 360000
+    h, r = divmod(ms, 36000)
+    m, r = divmod(r, 60000)
+    s, _ = divmod(r, 1000)
+    return ("%d:%02d:%02d" % (h,m,s)) if h else ("%d:%02d" % (m,s))
+
+class PlaylistModel(QAbstractListModel):
+    def __init__(self, playlist, *args, **kwargs):
+        super(PlaylistModel, self).__init__(*args, **kwargs)
+        self.playlist = playlist
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            media = self.playlist.media(index.row())
+            return media.canonicalUrl().fileName()
+
+    def rowCount(self, index):
+        return self.playlist.mediaCount()
 
 def search_bible(file = 'chinese_bible.json',phrase = ''):
     hit_book, hit_verse, hit_chapter = [],[],[]
@@ -483,6 +523,147 @@ class MyMainWindow(QMainWindow):
         self.pushButton_save_json.clicked.connect(self.save_json)
         self.pushButton_next_chapter.clicked.connect(self.go_to_next_chapter)
         self.pushButton_last_chapter.clicked.connect(self.go_to_last_chapter)
+        ####qmediaplayer settings from this line on####
+        self.player = QMediaPlayer()
+        self.player.error.connect(self.erroralert)
+        self.player.play()
+        # Setup the playlist.
+        self.playlist = QMediaPlaylist()
+        self.player.setPlaylist(self.playlist)
+        self.player.setVideoOutput(self.videowidget)
+        # Connect control buttons/slides for media player.
+        self.playButton.pressed.connect(self.player.play)
+        self.pauseButton.pressed.connect(self.player.pause)
+        self.stopButton.pressed.connect(self.player.stop)
+        self.volumeSlider.valueChanged.connect(self.player.setVolume)
+        self.previousButton.pressed.connect(self.playlist.previous)
+        self.nextButton.pressed.connect(self.playlist.next)
+
+        self.model = PlaylistModel(self.playlist)
+        self.playlistView.setModel(self.model)
+        self.playlist.currentIndexChanged.connect(self.playlist_position_changed)
+        selection_model = self.playlistView.selectionModel()
+        selection_model.selectionChanged.connect(self.playlist_selection_changed)
+
+        self.player.durationChanged.connect(self.update_duration)
+        self.player.positionChanged.connect(self.update_position)
+        self.timeSlider.valueChanged.connect(self.player.setPosition)
+
+        self.pushButton_load_file.clicked.connect(self.open_file)
+        self.pushButton_remove.clicked.connect(self.empty_files)
+        self.pushButton_download.clicked.connect(self.download_file)
+
+
+        self.setAcceptDrops(True)
+
+    def download_file(self):
+        url = self.lineEdit_url.text()
+        path = self.lineEdit_save_path.text()
+        download_mp4 = self.checkBox_video.isChecked()
+        if not Path(path).exists():
+            error_pop_up(f'{path} does not exists!','Error')
+            return
+        else:
+            try:
+                self._download(url, path, download_mp4)
+            except:
+                self._download(url, path, download_mp4)
+                # error_pop_up(f'Fail to download {url}!','Error')
+
+    def _download(self, url, path, download_mp4 = False):
+        ydl_opts_mp3 = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192'
+            }],
+            'postprocessor_args': [
+                '-ar', '16000'
+            ],
+            'prefer_ffmpeg': True,
+            'keepvideo': False,
+            'outtmpl':path + '/%(title)s.%(ext)s'
+            }
+
+        ydl_opts_video = {'outtmpl':path + '/%(title)s.%(ext)s','format':'best'}
+
+        if download_mp4:
+            ydl_opts = ydl_opts_video
+        else:
+            ydl_opts = ydl_opts_mp3
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+    def dragEnterEvent(self, e):
+        if e.mimeData().hasUrls():
+            e.acceptProposedAction()
+
+    def dropEvent(self, e):
+        for url in e.mimeData().urls():
+            self.playlist.addMedia(
+                QMediaContent(url)
+            )
+
+        self.model.layoutChanged.emit()
+
+        # If not playing, seeking to first of newly added + play.
+        if self.player.state() != QMediaPlayer.PlayingState:
+            i = self.playlist.mediaCount() - len(e.mimeData().urls())
+            self.playlist.setCurrentIndex(i)
+            self.player.play()
+
+    def open_file(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "mp3 Audio (*.mp3);mp4 Video (*.mp4);Movie files (*.mov);All files (*.*)")
+
+        if path:
+            self.playlist.addMedia(
+                QMediaContent(
+                    QUrl.fromLocalFile(path)
+                )
+            )
+
+        self.model.layoutChanged.emit()
+
+    def empty_files(self):
+        self.playlist.clear()
+
+    def update_duration(self, duration):
+        print("!", duration)
+        print("?", self.player.duration())
+        
+        self.timeSlider.setMaximum(duration)
+
+        if duration >= 0:
+            self.totalTimeLabel.setText(hhmmss(duration))
+
+    def update_position(self, position):
+        if position >= 0:
+            self.currentTimeLabel.setText(hhmmss(position))
+
+        # Disable the events to prevent updating triggering a setPosition event (can cause stuttering).
+        self.timeSlider.blockSignals(True)
+        self.timeSlider.setValue(position)
+        self.timeSlider.blockSignals(False)
+
+    def playlist_selection_changed(self, ix):
+        # We receive a QItemSelection from selectionChanged.
+        i = ix.indexes()[0].row()
+        self.playlist.setCurrentIndex(i)
+
+    def playlist_position_changed(self, i):
+        if i > -1:
+            ix = self.model.index(i)
+            self.playlistView.setCurrentIndex(ix)
+
+    def toggle_viewer(self, state):
+        if state:
+            self.viewer.show()
+        else:
+            self.viewer.hide()
+
+    def erroralert(self, *args):
+        print(args)
 
     def load_json(self):
         options = QFileDialog.Options()
