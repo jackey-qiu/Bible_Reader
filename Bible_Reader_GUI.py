@@ -29,11 +29,12 @@ import calendar
 import smtplib
 from email.mime.text import MIMEText
 import sys,os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsScene, QPlainTextEdit, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QInputDialog, QGraphicsScene, QPlainTextEdit, QMessageBox, QLineEdit
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaPlaylist
 from PyQt5.QtCore import QDate, Qt, QAbstractListModel,QUrl
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
+from PyQt5 import QtCore
 from util import *
 from random import randint
 from langconv import *
@@ -43,145 +44,10 @@ try:
 except:
     import locate_path
 import youtube_dl
+from bible_book import *
 msg_path = locate_path.module_path_locator()
 analyzer = ChineseAnalyzer()
 print(msg_path)
-
-bible_book_english=\
-['genesis',
- 'exodus',
- 'leviticus',
- 'numbers',
- 'deuteronomy',
- 'joshua',
- 'judges',
- 'ruth',
- '1-samuel',
- '2-samuel',
- '1-kings',
- '2-kings',
- '1-chronicles',
- '2-chronicles',
- 'ezra',
- 'nehemiah',
- 'esther',
- 'job',
- 'psalms',
- 'proverbs',
- 'ecclesiastes',
- 'song-of-solomon',
- 'isaiah',
- 'jeremiah',
- 'lamentations',
- 'ezekiel',
- 'daniel',
- 'hosea',
- 'joel',
- 'amos',
- 'obadiah',
- 'jonah',
- 'micah',
- 'nahum',
- 'habakkuk',
- 'zephaniah',
- 'haggai',
- 'zechariah',
- 'malachi',
- 'matthew',
- 'mark',
- 'luke',
- 'john',
- 'acts',
- 'romans',
- '1-corinthians',
- '2-corinthians',
- 'galatians',
- 'ephesians',
- 'philippians',
- 'colossians',
- '1-thessalonians',
- '2-thessalonians',
- '1-timothy',
- '2-timothy',
- 'titus',
- 'philemon',
- 'hebrews',
- 'james',
- '1-peter',
- '2-peter',
- '1-john',
- '2-john',
- '3-john',
- 'jude',
- 'revelation']
-
-bible_books = \
-['创世记',
- '出埃及记',
- '利未记',
- '民数记',
- '申命记',
- '约书亚记',
- '士师记',
- '路得记',
- '撒母耳记上',
- '撒母耳记下',
- '列王纪上',
- '列王纪下',
- '历代志上',
- '历代志下',
- '以斯拉记',
- '尼希米记',
- '以斯帖记',
- '约伯记',
- '诗篇',
- '箴言',
- '传道书',
- '雅歌',
- '以赛亚书',
- '耶利米书',
- '耶利米哀歌',
- '以西结书',
- '但以理书',
- '何西阿书',
- '约珥书',
- '阿摩司书',
- '俄巴底亚书',
- '约拿书',
- '弥迦书',
- '那鸿书',
- '哈巴谷书',
- '西番雅书',
- '哈该书',
- '撒迦利亚书',
- '玛拉基书',
- '马太福音',
- '马可福音',
- '路加福音',
- '约翰福音',
- '使徒行传',
- '罗马书',
- '哥林多前书',
- '哥林多后书',
- '加拉太书',
- '以弗所书',
- '腓立比书',
- '歌罗西书',
- '帖撒罗尼迦前书',
- '帖撒罗尼迦后书',
- '提摩太前书',
- '提摩太后书',
- '提多书',
- '腓利门书',
- '希伯来书',
- '雅各书',
- '彼得前书',
- '彼得后书',
- '约翰一书',
- '约翰二书',
- '约翰三书',
- '犹大书',
- '启示录']
 
 def error_pop_up(msg_text = 'error', window_title = ['Error','Information','Warning'][0]):
     msg = QMessageBox()
@@ -201,10 +67,47 @@ def hhmmss(ms):
     # s = 1000
     # m = 60000
     # h = 360000
-    h, r = divmod(ms, 36000)
+    h, r = divmod(ms, 3600000)
     m, r = divmod(r, 60000)
     s, _ = divmod(r, 1000)
     return ("%d:%02d:%02d" % (h,m,s)) if h else ("%d:%02d" % (m,s))
+
+class DownloadYoutube(QtCore.QObject):
+    def __init__(self):
+        super(DownloadYoutube, self).__init__()
+        self.url = ''
+        self.path = ''
+        self.download_mp4 = False
+
+    def prepare_download(self, url, path, download_mp4):
+        self.url = url
+        self.path = path
+        self.download_mp4 = download_mp4
+
+    def download(self):
+        ydl_opts_mp3 = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192'
+            }],
+            'postprocessor_args': [
+                '-ar', '16000'
+            ],
+            'prefer_ffmpeg': True,
+            'keepvideo': False,
+            'outtmpl':self.path + '/%(title)s.%(ext)s'
+            }
+
+        ydl_opts_video = {'outtmpl':self.path + '/%(title)s.%(ext)s','format':'best'}
+
+        if self.download_mp4:
+            ydl_opts = ydl_opts_video
+        else:
+            ydl_opts = ydl_opts_mp3
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([self.url])
 
 class PlaylistModel(QAbstractListModel):
     def __init__(self, playlist, *args, **kwargs):
@@ -219,208 +122,15 @@ class PlaylistModel(QAbstractListModel):
     def rowCount(self, index):
         return self.playlist.mediaCount()
 
-def search_bible(file = 'chinese_bible.json',phrase = ''):
-    hit_book, hit_verse, hit_chapter = [],[],[]
-    if phrase == '':
-        return
-    bible_content = {}
-    with open(file,'r') as f:
-        bible_content =  json.load(f)
-    schema = Schema(book_name=fields.TEXT(stored=True,analyzer=analyzer), chapter=fields.TEXT(stored=True), verse = fields.TEXT(stored=True),content=fields.TEXT(analyzer=analyzer))
-    if not os.path.exists("index"):
-        os.mkdir("index")
-        ix = create_in("index", schema)
-        writer = ix.writer()
-        for book in bible_content:
-            for chapter in bible_content[book]:
-                for verse in bible_content[book][chapter]:
-                    writer.add_document(book_name=book, chapter=chapter, verse = verse,
-                        content=bible_content[book][chapter][verse])
-        writer.commit()
-    else:
-        ix = open_dir('index')
-        ix.writer().commit()
-    with ix.searcher() as searcher:
-        query = QueryParser("content", ix.schema).parse(phrase)
-        results = searcher.search(query,limit = None)
-        for each in results:
-            hit_book.append(each['book_name'])
-            hit_chapter.append(each['chapter'])
-            hit_verse.append(each['verse'])
-        return zip(hit_book,hit_chapter,hit_verse)
-
-def crawl_english_bible_to_json_file_2(file='english_bible.json',version_tag = 'niv', start_link=''):
-    file = file.replace('.json','_{}.json'.format(version_tag))
-    beginning_link = "https://www.biblica.com/bible/{}/genesis/1/".format(version_tag)
-    if start_link == '':
-        start_link = beginning_link
-    bible_content = {}
-    with open(file,'r') as f:
-        bible_content =  json.load(f)
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
-    next_link = start_link
-    def _get_chapter(link = start_link):
-        r= Request(link,headers=headers)
-        url_temp = urllib.request.urlopen(r)
-        html= etree.HTML(url_temp.read())
-        book = link.rsplit('/')[-3]
-        chapter = link.rsplit('/')[-2]
-        next_link = html.xpath('//*[@id="online-bible"]/div[2]/div/div/div/div[4]/a[2]/@href')[0]
-        verses_current_chapter = html.xpath('//*[contains(@id,"verse-")]/text()')
-        return book, chapter, verses_current_chapter, next_link
-
-    while True:
-        try:
-            book, chapter_number, chapters, next_link = _get_chapter(next_link)
-        except:
-            print('Save json file now!')
-            with open(file,'w') as outfile:
-                json.dump(bible_content,outfile)
-            print('failure, wait for 10 s')
-            time.sleep(10)
-            book, chapter_number, chapters, next_link = _get_chapter(next_link)
-
-        if next_link == beginning_link:
-            if book not in bible_content:
-                bible_content[book] = {}
-            bible_content[book][chapter_number] = dict(zip(range(1,len(chapters)+1),chapters))
-            print('crawling {} chapter {}'.format(book,chapter_number))
-            print('Save json file now!')
-            with open(file,'w') as outfile:
-                json.dump(bible_content,outfile)
-            break
-        else:
-            if book not in bible_content:
-                bible_content[book] = {}
-            bible_content[book][chapter_number] = dict(zip(range(1,len(chapters)+1),chapters))
-            print('crawling {} chapter {}'.format(book,chapter_number))
-
-
-def crawl_english_bible_to_json_file(file='english_bible.json',version_tag='niv',books = bible_book_english):
-    bible_content = {}
-    file = file.replace('.json','_{}.json'.format(version_tag))
-    try:
-        with open(file,'r') as f:
-            bible_content =  json.load(f)
-    except:
-        pass
-    global current_book
-    current_book = books[0]
-    
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
-    if version_tag == 'niv':
-        html_link_head = "https://www.biblestudytools.com"
-    else:
-        html_link_head = "https://www.biblestudytools.com/"+version_tag
-
-    def _get_chapter(books):
-        hit = 0
-        for book in books:
-            global current_book
-            current_book = book
-            if book not in bible_content:
-                bible_content[book] = {}
-            i=1
-            while True:
-                html_link_temp = html_link_head+'/{}/{}.html'.format(book,i)
-                succed = False
-                for j in range(10):#try request the html at maximum 10 times
-                    try:
-                        bible_content[book][str(i)] = {}
-                        r= Request(html_link_temp,headers=headers)
-                        url_temp = urllib.request.urlopen(r)
-                        html= etree.HTML(url_temp.read())
-                        succed = True
-                        break
-                    except:
-                        pass
-                if not succed:
-                    break
-                verses = []
-                for jj in range(1,2000):
-                    verse_temp = ''.join(html.xpath('//*[@id="v-{}"]/span[2]/text()'.format(jj)))
-                    if verse_temp == '':
-                        break
-                    else:
-                        verses.append(verse_temp)
-                verses = [each.rstrip().lstrip() for each in verses]
-                for ii in range(len(verses)):
-                    bible_content[book][str(i)][str(ii+1)] = verses[ii] 
-                i = i + 1
-                hit = hit +1
-                print("crawing {} chapter {} now!".format(book,i))
-                if hit == 100:
-                    time.sleep(10)
-                    with open(file,'w') as outfile:
-                        json.dump(bible_content,outfile)
-                    hit = 0
-        with open(file,'w') as outfile:
-            json.dump(bible_content,outfile)
-        return current_book
-
-    while current_book!=books[-1]:
-        print(current_book)
-        current_book = _get_chapter(books[books.index(current_book):])
-
-def craw_all_chapters_to_json_file(file=None,books = bible_books[61:]):
-    bible_content = {}
-    with open(file,'r') as f:
-        bible_content =  json.load(f)
-    global current_book
-    current_book = books[0]
-
-    def _get_chapter(books):
-        chapters_total = 0
-        for each_book in books:
-            global current_book
-            current_book = each_book
-            if each_book not in bible_content:
-                bible_content[each_book] = {}
-            else:
-                pass
-            for i in range(1,100000):
-                chapters_total+=1
-                if chapters_total==100:
-                    print('sleep for 10 seconds!')
-                    with open(file,'w') as outfile:
-                        json.dump(bible_content,outfile)
-                    time.sleep(10)
-                    chapters_total=0
-                if i not in bible_content[each_book]:
-                    bible_content[each_book][i] = {}
-                try:
-                    url = quote("http://mobile.chinesebibleonline.com/book/{}/{}".format(each_book,i),safe=string.printable)
-                    sock_temp =urllib.request.urlopen(url)
-                    html_temp = etree.HTML(sock_temp.read())
-                    sock_temp.close()
-                    scriptures = html_temp.xpath("/html/body/div[2]/div/span[2]/text()")
-                    verse_number = html_temp.xpath("/html/body/div[2]/div/span[1]/text()")
-                    if len(scriptures) == 0:
-                        break
-                    else:
-                        print("Crawing Bible book {} chapter {} now!".format(each_book,i))
-                        for ii in range(len(verse_number)):
-                            if ii+1 not in bible_content[each_book][i]:
-                                bible_content[each_book][i][ii+1] = scriptures[ii]
-                except:
-                    print('sleep for 10 seconds!')
-                    time.sleep(10)
-                    return current_book
-        
-        with open(file,'w') as outfile:
-            json.dump(bible_content,outfile)
-        return current_book
-
-    while current_book!=books[-1]:
-        print(current_book)
-        current_book = _get_chapter(books[books.index(current_book):])
-
-                    
-
 class MyMainWindow(QMainWindow):
     def __init__(self, parent = None):
         super(MyMainWindow, self).__init__(parent)
         #pg.mkQApp()
+        self.document_folder = ''
+        self.download = DownloadYoutube()
+        self.thread_download = QtCore.QThread()
+        self.download.moveToThread(self.thread_download)
+        self.thread_download.started.connect(self.download.download)
         uic.loadUi(os.path.join(msg_path,'ui_bible_reading_reminder_new2.ui'),self)
         self.load_reading_plan()
         self.plainTextEdit.setStyleSheet(
@@ -434,23 +144,9 @@ class MyMainWindow(QMainWindow):
                         """QPlainTextEdit {background-color: #FFFFFF;
                            color: #6600CC;}""")
         self.setWindowTitle('Bible Reader')
-        # sock = urllib.request.urlopen("http://mobile.chinesebibleonline.com/bible")  
-        # self.html_overview = etree.HTML(sock.read())
-        # sock.close()
         self.html_overview_ds = 'error'
         with open('/Users/canrong/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
             self.desert_scripture = json.load(f)
-        '''
-        try:
-            url_overview_ds = "https://www.24en.com/novel/religion/streams-in-the-desert.html"
-            sock = urllib.request.urlopen(url_overview_ds)
-            self.html_overview_ds = etree.HTML(sock.read())
-            sock.close()
-        except:
-            self.html_overview_ds = 'error'
-            with open('/Users/canrong/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
-                self.desert_scripture = json.load(f)
-        '''
 
         try:
             url_scripture = "http://cclw.net/resources/shenjinjinju.htm"
@@ -486,22 +182,18 @@ class MyMainWindow(QMainWindow):
             self.get_spring_desert_article()
         except:
             pass
-        # self.load_extra_chapter_number()
         self.check_read_or_not()
         self.get_scripture_for_today_local_disk()
         #signal-slot-pair connection
         self.calendarWidget.selectionChanged.connect(self.get_spring_desert_article)
         self.pushButton_today.clicked.connect(self.update_count_down_time_today)
         self.pushButton_save_plan.clicked.connect(self.update_reading_plan)
-        #self.pushButton_today.clicked.connect(self.get_scripture_for_today)
         self.pushButton_today.clicked.connect(self.get_scripture_for_today_local_disk)
         self.pushButton_specified.clicked.connect(self.get_scripture_specified)
         self.pushButton_load.clicked.connect(self.load_all_notes_json)
         self.pushButton_save.clicked.connect(self.save_notes_json_overwrite)
         self.pushButton_append.clicked.connect(self.save_notes_json_append)
-        # self.pushButton_before.clicked.connect(self.update_count_down_time_2))
         self.pushButton_before.clicked.connect(self.update_count_down_time)
-        # self.pushButton_before.clicked.connect(self.get_scripture_for_today)
         self.pushButton_before.clicked.connect(self.get_scripture_for_today_local_disk)
         self.pushButton_check.clicked.connect(self.update_check_read)
         self.pushButton_change.clicked.connect(self.get_golden_scripture)
@@ -510,17 +202,17 @@ class MyMainWindow(QMainWindow):
         self.pushButton_search.clicked.connect(self.search_bible)
         self.spinBox_start_date.valueChanged.connect(self.update_count_down_time)
         self.spinBox_start_month.valueChanged.connect(self.update_count_down_time)
-        # self.spinBox_more_new.valueChanged.connect(self.update_extra_chapter_number)
-        # self.spinBox_more_old.valueChanged.connect(self.update_extra_chapter_number)
         self.comboBox_book.currentIndexChanged.connect(self.set_bible_book)
         self.comboBox_book_chapter.currentIndexChanged.connect(self.set_book_chapter)
-        # self.comboBox_book_chapter.view().pressed.connect(self.set_book_chapter)
-        # self.comboBox_plan.currentIndexChanged.connect(self.update_reading_plan)
         self.comboBox_bible_version.currentIndexChanged.connect(self.update_bible_version)
         self.pushButton_show_notes.clicked.connect(self.show_note_panel)
         self.pushButton_show_scripture.clicked.connect(self.show_scripture_panel)
         self.pushButton_load_json.clicked.connect(self.load_json)
+        self.pushButton_save_json_as.clicked.connect(self.save_json_as)
         self.pushButton_save_json.clicked.connect(self.save_json)
+        self.pushButton_new.clicked.connect(self.new_json)
+        self.pushButton_load_folder.clicked.connect(self.load_doc_files)
+        self.listWidget_docs.itemDoubleClicked.connect(self.open_selected_doc_in_listWidget)
         self.pushButton_next_chapter.clicked.connect(self.go_to_next_chapter)
         self.pushButton_last_chapter.clicked.connect(self.go_to_last_chapter)
         ####qmediaplayer settings from this line on####
@@ -552,23 +244,46 @@ class MyMainWindow(QMainWindow):
         self.pushButton_load_file.clicked.connect(self.open_file)
         self.pushButton_remove.clicked.connect(self.empty_files)
         self.pushButton_download.clicked.connect(self.download_file)
-
-
         self.setAcceptDrops(True)
+
+    def open_selected_doc_in_listWidget(self):
+        fileName = os.path.join(self.document_folder,self.listWidget_docs.currentItem().text())
+        if fileName:
+            self.scripture_explain_file_name = fileName
+            with open(fileName,'r') as f:
+                self.scripture_explain = json.load(f)
+            self.lineEdit_book_title.setText(fileName)
+            self.comboBox_book_chapter.clear()
+            self.comboBox_book_chapter.addItems(sorted(list(self.scripture_explain.keys()))) 
+
+    def load_doc_files(self):
+        '''
+        load all json files(*.json) located in a selected folder
+        '''
+        folder = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.document_folder = folder
+        for file in os.listdir(folder):
+            if file.endswith('.json'):
+                self.listWidget_docs.clear()
+                self.listWidget_docs.addItem(file)
 
     def download_file(self):
         url = self.lineEdit_url.text()
         path = self.lineEdit_save_path.text()
         download_mp4 = self.checkBox_video.isChecked()
+        self.download.prepare_download(url, path, download_mp4)
         if not Path(path).exists():
             error_pop_up(f'{path} does not exists!','Error')
             return
         else:
             try:
-                self._download(url, path, download_mp4)
+                #self._download(url, path, download_mp4)
+                #self.download.download()
+                self.thread_download.start()
             except:
-                self._download(url, path, download_mp4)
-                # error_pop_up(f'Fail to download {url}!','Error')
+                
+                #self._download(url, path, download_mp4)
+                error_pop_up(f'Fail to download {url}!','Error')
 
     def _download(self, url, path, download_mp4 = False):
         ydl_opts_mp3 = {
@@ -629,8 +344,8 @@ class MyMainWindow(QMainWindow):
         self.playlist.clear()
 
     def update_duration(self, duration):
-        print("!", duration)
-        print("?", self.player.duration())
+        # print("!", duration)
+        # print("?", self.player.duration())
         
         self.timeSlider.setMaximum(duration)
 
@@ -665,26 +380,62 @@ class MyMainWindow(QMainWindow):
     def erroralert(self, *args):
         print(args)
 
+    def new_json(self):
+        text, okPressed = QInputDialog.getText(self, "Get text","File name:", QLineEdit.Normal, "newfile.json")
+        if okPressed and text != '':
+            if self.document_folder=='':
+                self.document_folder = msg_path 
+            fileName = os.path.join(self.document_folder,text)
+            self.lineEdit_book_title.setText(fileName)
+            self.comboBox_book_chapter.clear()
+            self.comboBox_book_chapter.addItems(['init'])
+            with open(fileName,'w') as f:
+                #self.lineEdit_new_chapter.setText('init')
+                self.plainTextEdit_scripture_explain.setPlainText('')
+                json.dump({convert('init'):convert(self.plainTextEdit_scripture_explain.toPlainText())},f)
+            with open(fileName,'r') as f:
+                self.scripture_explain = json.load(f)
+            self.listWidget_docs.clear()
+            self.listWidget_docs.addItem(text)
+            self.statusbar.showMessage('New json file is created!')
+
     def load_json(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","Data Files (*.json)", options=options)
         if fileName:
             self.scripture_explain_file_name = fileName
+            if self.document_folder=='':
+                self.document_folder = os.path.dirname(fileName)
+                self.listWidget_docs.clear()
+                self.listWidget_docs.addItem(os.path.basename(fileName))
             with open(fileName,'r') as f:
                 self.scripture_explain = json.load(f)
             self.lineEdit_book_title.setText(fileName)
             self.comboBox_book_chapter.clear()
             self.comboBox_book_chapter.addItems(sorted(list(self.scripture_explain.keys())))
 
-    def save_json(self):
+    def save_json_as(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(self, "Save file as", "", "json file (*.json);;all files (*.*)")
         fileName = convert(fileName)
         if fileName:
             with open(fileName,'w') as f:
-                json.dump({convert(os.path.basename(fileName)):convert(self.plainTextEdit_scripture_explain.toPlainText())},f)
+                keys = list(self.scripture_explain.keys())
+                json_content = {}
+                if self.lineEdit_new_chapter.text()!='':
+                    json_content.update({convert(self.lineEdit_new_chapter.text()):convert(self.plainTextEdit_scripture_explain.toPlainText())})
+                for each in keys:
+                    if each == self.comboBox_book_chapter.currentText():
+                        if self.lineEdit_new_chapter.text()=='':
+                            #json.dump({convert(os.path.basename(fileName)):convert(self.plainTextEdit_scripture_explain.toPlainText())},f)
+                            json_content.update({convert(each):convert(self.plainTextEdit_scripture_explain.toPlainText())})
+                        else:
+                            json_content.update({convert(each):convert(self.scripture_explain[each])})
+                    else:
+                        json_content.update({convert(each):convert(self.scripture_explain[each])})
+                json.dump(json_content,f)
             with open(fileName,'r') as f:
                 self.scripture_explain = json.load(f)
             self.lineEdit_book_title.setText(fileName)
@@ -692,6 +443,32 @@ class MyMainWindow(QMainWindow):
             self.comboBox_book_chapter.addItems(sorted(list(self.scripture_explain.keys())))
             self.statusbar.clearMessage()
             self.statusbar.showMessage("新的json文件保存成功！")
+
+    def save_json(self):
+        fileName = convert(self.lineEdit_book_title.text())
+        if fileName:
+            with open(fileName,'w') as f:
+                keys = list(self.scripture_explain.keys())
+                json_content = {}
+                if self.lineEdit_new_chapter.text()!='':
+                    json_content.update({convert(self.lineEdit_new_chapter.text()):convert(self.plainTextEdit_scripture_explain.toPlainText())})
+                for each in keys:
+                    if each == self.comboBox_book_chapter.currentText():
+                        if self.lineEdit_new_chapter.text()=='':
+                            #json.dump({convert(os.path.basename(fileName)):convert(self.plainTextEdit_scripture_explain.toPlainText())},f)
+                            json_content.update({convert(each):convert(self.plainTextEdit_scripture_explain.toPlainText())})
+                        else:
+                            json_content.update({convert(each):convert(self.scripture_explain[each])})
+                    else:
+                        json_content.update({convert(each):convert(self.scripture_explain[each])})
+                json.dump(json_content,f)
+            with open(fileName,'r') as f:
+                self.scripture_explain = json.load(f)
+            self.lineEdit_book_title.setText(fileName)
+            self.comboBox_book_chapter.clear()
+            self.comboBox_book_chapter.addItems(sorted(list(self.scripture_explain.keys())))
+            self.statusbar.clearMessage()
+            self.statusbar.showMessage("json文件保存成功！")
 
     def set_book_chapter(self):
         current_text = self.comboBox_book_chapter.currentText()
