@@ -262,9 +262,9 @@ class MyMainWindow(QMainWindow):
         '''
         folder = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.document_folder = folder
+        self.listWidget_docs.clear()
         for file in os.listdir(folder):
             if file.endswith('.json'):
-                self.listWidget_docs.clear()
                 self.listWidget_docs.addItem(file)
 
     def download_file(self):
@@ -467,6 +467,7 @@ class MyMainWindow(QMainWindow):
             self.lineEdit_book_title.setText(fileName)
             self.comboBox_book_chapter.clear()
             self.comboBox_book_chapter.addItems(sorted(list(self.scripture_explain.keys())))
+            self.lineEdit_new_chapter.setText('')
             self.statusbar.clearMessage()
             self.statusbar.showMessage("json文件保存成功！")
 
