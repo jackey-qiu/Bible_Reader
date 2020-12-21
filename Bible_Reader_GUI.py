@@ -202,6 +202,7 @@ class MyMainWindow(QMainWindow):
         self.pushButton_search.clicked.connect(self.search_bible)
         self.spinBox_start_date.valueChanged.connect(self.update_count_down_time)
         self.spinBox_start_month.valueChanged.connect(self.update_count_down_time)
+        self.spinBox_start_year.valueChanged.connect(self.update_count_down_time)
         self.comboBox_book.currentIndexChanged.connect(self.set_bible_book)
         self.comboBox_book_chapter.currentIndexChanged.connect(self.set_book_chapter)
         self.comboBox_bible_version.currentIndexChanged.connect(self.update_bible_version)
@@ -664,15 +665,16 @@ class MyMainWindow(QMainWindow):
                     self.spinBox_old.setValue(eval(items[1]))
                     self.spinBox_new.setValue(eval(items[2]))
                 elif items[0] == 'begin':
-                    self.spinBox_start_month.setValue(eval(items[1]))
-                    self.spinBox_start_date.setValue(eval(items[2]))
+                    self.spinBox_start_year.setValue(eval(items[1]))
+                    self.spinBox_start_month.setValue(eval(items[2]))
+                    self.spinBox_start_date.setValue(eval(items[3]))
 
     def update_reading_plan(self):
         with open(os.path.join(msg_path,'current_read_plan.txt'),'w') as f:
             f.write('read_order {}\n'.format(self.checkBox_order.isChecked()))
             f.write('offset {}  {}\n'.format(self.spinBox_more_old.value(),self.spinBox_more_new.value()))
             f.write('speed {}  {}\n'.format(self.spinBox_old.value(),self.spinBox_new.value()))
-            f.write('begin {}  {}\n'.format(self.spinBox_start_month.value(),self.spinBox_start_date.value()))
+            f.write('begin {}  {}\n'.format(self.spinBox_start_year.value(),self.spinBox_start_month.value(),self.spinBox_start_date.value()))
         self.statusbar.clearMessage()
         self.statusbar.showMessage("读经计划保存成功！")
 
@@ -1125,7 +1127,8 @@ class MyMainWindow(QMainWindow):
     def update_count_down_time(self):
         start_month = int(self.spinBox_start_month.value())
         start_date = int(self.spinBox_start_date.value())
-        start_year = int(datetime.date.today().year)
+        start_year = int(self.spinBox_start_year.value())
+        #start_year = int(datetime.date.today().year)
         start = datetime.date(start_year, start_month, start_date)
         date_before = self.calendarWidget.selectedDate().toPyDate()
         self.days_elapsed=(date_before-start).days
@@ -1136,7 +1139,8 @@ class MyMainWindow(QMainWindow):
     def update_count_down_time_today(self):
         start_month = int(self.spinBox_start_month.value())
         start_date = int(self.spinBox_start_date.value())
-        start_year = int(datetime.date.today().year)
+        start_year = int(self.spinBox_start_year.value())
+        # start_year = int(datetime.date.today().year)
         start = datetime.date(start_year, start_month, start_date)
         self.days_elapsed  = (datetime.date.today()-start).days
         self.calendarWidget.setSelectedDate(QDate(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
@@ -1149,7 +1153,8 @@ class MyMainWindow(QMainWindow):
     def update_count_down_time_2(self):
         start_month = int(self.spinBox_start_month.value())
         start_date = int(self.spinBox_start_date.value())
-        start_year = int(datetime.date.today().year)
+        start_year = int(self.spinBox_start_year.value())
+        # start_year = int(datetime.date.today().year)
         start = datetime.date(start_year, start_month, start_date)
         count_down =  int(self.total_chapter/self.speed)+[1,0][int((self.total_chapter%self.speed)==0)] - (self.calendarWidget.selectedDate().toPyDate()-start).days
         self.lineEdit_count_down.setText(str(count_down))
