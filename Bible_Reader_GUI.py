@@ -278,6 +278,10 @@ class MyMainWindow(QMainWindow):
             return
         else:
             try:
+                self.thread_download.terminate()
+            except:
+                pass
+            try:
                 #self._download(url, path, download_mp4)
                 #self.download.download()
                 self.thread_download.start()
