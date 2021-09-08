@@ -148,15 +148,7 @@ class MyMainWindow(QMainWindow):
         with open('/Users/canrong/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
             self.desert_scripture = json.load(f)
 
-        try:
-            url_scripture = "http://cclw.net/resources/shenjinjinju.htm"
-            sock = urllib.request.urlopen(url_scripture)
-            self.html_scripture = etree.HTML(sock.read())
-            sock.close()
-            self.scripture_list = self.html_scripture.xpath("/html/body/center/table/tbody/tr/td/ol/p/text()")
-        except:
-            self.html_scripture = 'error'
-            self.scripture_list = 'error'
+        self.html_scripture = "https://dailyverses.net/tc/"
         self.get_golden_scripture()
 
         self.bible_chinese_json = ''
@@ -520,19 +512,30 @@ class MyMainWindow(QMainWindow):
             self.bible_english_json = json.load(f)
 
     def get_golden_scripture(self):
-        if self.scripture_list != 'error':
-            try:
-                index1,index2 = randint(0,len(self.scripture_list)),randint(0,len(self.scripture_list))
-                s1,s2 = self.scripture_list[index1].rsplit(), self.scripture_list[index2].rsplit()
-                s1,s2 = "".join(s1[1:]),"".join(s2[1:])
-            except:
-                s1,s2 = '',''
-        else:
-            s1, s2 = "Network issue!", "Check you have internet connection, and try again!"
+        from datetime import datetime, timedelta
+        begin = datetime.strptime('2021-1-1','%Y-%m-%d')
+        span = timedelta(days = randint(0,364))
+        now = begin + span
+        url_scripture = "https://dailyverses.net/tc/{}/{}/{}".format(now.year, now.month, now.day)
+        sock = urllib.request.urlopen(url_scripture)
+        self.html_scripture = etree.HTML(sock.read())
+        sock.close()
+        try:
+            self.scripture_list = [self.html_scripture.xpath("//div/span[@class='v1']/text()")[0] + '\n' + self.html_scripture.xpath("//div/a[@class='vc']/text()")[0]]
+            self.scripture_img_link = "https://dailyverses.net" + self.html_scripture.xpath('//a/img/@src')[0]
+            print(self.scripture_img_link)
+        except:
+            return
+        f = open(os.path.join(msg_path,'scripture_photo.jpg'),'wb')           
+        f.write(urllib.request.urlopen(self.scripture_img_link).read())
+        f.close()
+        self.label_scripture.setPixmap(QPixmap(os.path.join(msg_path,'scripture_photo.jpg')))
+        self.label_scripture.setScaledContents(True)
+        s1 = self.scripture_list[0]
         self.textBrowser_scripture.clear()
         cursor = self.textBrowser_scripture.textCursor()
         cursor.insertHtml('''<p><span style="color: red;">{} <br></span>'''.format(" "))
-        self.textBrowser_scripture.setText(''.join(['\n','1.',s1,'\n\n','2.',s2])) 
+        self.textBrowser_scripture.setText(''.join(['\n',s1])) 
 
     def search_bible(self):
         if self.lineEdit_key_words.text()=='':
@@ -678,7 +681,7 @@ class MyMainWindow(QMainWindow):
             f.write('read_order {}\n'.format(self.checkBox_order.isChecked()))
             f.write('offset {}  {}\n'.format(self.spinBox_more_old.value(),self.spinBox_more_new.value()))
             f.write('speed {}  {}\n'.format(self.spinBox_old.value(),self.spinBox_new.value()))
-            f.write('begin {}  {}\n'.format(self.spinBox_start_year.value(),self.spinBox_start_month.value(),self.spinBox_start_date.value()))
+            f.write('begin {}  {} {}\n'.format(self.spinBox_start_year.value(),self.spinBox_start_month.value(),self.spinBox_start_date.value()))
         self.statusbar.clearMessage()
         self.statusbar.showMessage("读经计划保存成功！")
 
