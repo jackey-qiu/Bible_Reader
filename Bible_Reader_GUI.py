@@ -145,7 +145,7 @@ class MyMainWindow(QMainWindow):
                            color: #6600CC;}""")
         self.setWindowTitle('Bible Reader')
         self.html_overview_ds = 'error'
-        with open('/Users/canrong/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
+        with open('/Users/canrongqiu/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
             self.desert_scripture = json.load(f)
 
         self.html_scripture = "https://dailyverses.net/tc/"
