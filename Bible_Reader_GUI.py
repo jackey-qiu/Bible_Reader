@@ -47,7 +47,7 @@ import youtube_dl
 from bible_book import *
 msg_path = locate_path.module_path_locator()
 analyzer = ChineseAnalyzer()
-print(msg_path)
+# print(msg_path)
 
 def error_pop_up(msg_text = 'error', window_title = ['Error','Information','Warning'][0]):
     msg = QMessageBox()
@@ -256,6 +256,8 @@ class MyMainWindow(QMainWindow):
         folder = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.document_folder = folder
         self.listWidget_docs.clear()
+        if folder=='':
+            return
         for file in os.listdir(folder):
             if file.endswith('.json'):
                 self.listWidget_docs.addItem(file)
@@ -523,7 +525,7 @@ class MyMainWindow(QMainWindow):
         try:
             self.scripture_list = [self.html_scripture.xpath("//div/span[@class='v1']/text()")[0] + '\n' + self.html_scripture.xpath("//div/a[@class='vc']/text()")[0]]
             self.scripture_img_link = "https://dailyverses.net" + self.html_scripture.xpath('//a/img/@src')[0]
-            print(self.scripture_img_link)
+            # print(self.scripture_img_link)
         except:
             return
         f = open(os.path.join(msg_path,'scripture_photo.jpg'),'wb')           
@@ -795,7 +797,6 @@ class MyMainWindow(QMainWindow):
                     hit_book.append(each)
                     hit_chapter.append(total_chapter_read+speed-1-chapters_accum+1)
                     break
-            print(hit_book,hit_chapter)
             if len(hit_book)==0:
                 return [],[]
             elif len(hit_book)==1:
@@ -852,7 +853,10 @@ class MyMainWindow(QMainWindow):
         speed_all = [self.spinBox_old.value(),self.spinBox_new.value()][int(in_new_testimony)]
         offset_all = [self.spinBox_more_old.value(),self.spinBox_more_new.value()][int(in_new_testimony)]
         hit_books,hit_chapters = self.get_book_chapters(days_elapsed =self.days_elapsed, speed = speed_all, offset = offset_all, plan_type = 'all')
-        num_days_left_all = int(self.get_num_chapters_left(hit_books[-1],hit_chapters[-1],'all')/speed_all)
+        if len(hit_books)==0:
+            num_days_left_all = 0
+        else:
+            num_days_left_all = int(self.get_num_chapters_left(hit_books[-1],hit_chapters[-1],'all')/speed_all)
         #setup for the other mode, ie reading chapters from old testimony and new testimony at the same time
         hit_books_new,hit_chapters_new = self.get_book_chapters(days_elapsed =self.days_elapsed, speed = self.spinBox_new.value(), offset = self.spinBox_more_new.value(), plan_type = 'new')
         hit_chapters_new = [str(each) for each in hit_chapters_new]
@@ -868,7 +872,7 @@ class MyMainWindow(QMainWindow):
             num_chapters_left_old = 0
         else:
             num_chapters_left_old = self.get_num_chapters_left(hit_books_old[-1],hit_chapters_old[-1],'old')
-        print(num_chapters_left_new,num_chapters_left_old)
+        # print(num_chapters_left_new,num_chapters_left_old)
         num_days_left_all_together = int((num_chapters_left_old+num_chapters_left_new)/(self.spinBox_old.value()+self.spinBox_new.value()))
 
         #update reading status now
@@ -884,11 +888,13 @@ class MyMainWindow(QMainWindow):
         old_testimony_content_eng = []
         new_testimony_content_eng = []
         all_content_cn, all_content_eng = [], []
+        read_chapters_for_today = []
         if self.radioButton_cn.isChecked():
             if self.checkBox_order.isChecked():
                 for i,each in enumerate(hit_books):
                     all_content_cn_ = self.bible_chinese_json[each][hit_chapters[i]]
                     all_content_cn.append('《{}》第{}章'.format(each,hit_chapters[i]))
+                    read_chapters_for_today.append(all_content_cn[-1])
                     for each_verse, each_scripture in all_content_cn_.items():
                         all_content_cn.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
                 self.textBrowser_bible.setText('\n\n\n'.join(all_content_cn)) 
@@ -896,11 +902,13 @@ class MyMainWindow(QMainWindow):
                 for i,each in enumerate(hit_books_old):
                     old_testimony_content_cn_ = self.bible_chinese_json[each][hit_chapters_old[i]]
                     old_testimony_content_cn.append('《{}》第{}章'.format(each,hit_chapters_old[i]))
+                    read_chapters_for_today.append(old_testimony_content_cn[-1])
                     for each_verse, each_scripture in old_testimony_content_cn_.items():
                         old_testimony_content_cn.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
                 for i,each in enumerate(hit_books_new):
                     new_testimony_content_cn_ = self.bible_chinese_json[each][hit_chapters_new[i]]
                     new_testimony_content_cn.append('《{}》第{}章'.format(each,hit_chapters_new[i]))
+                    read_chapters_for_today.append(new_testimony_content_cn[-1])
                     for each_verse, each_scripture in new_testimony_content_cn_.items():
                         new_testimony_content_cn.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
                 self.textBrowser_bible.setText('\n\n\n'.join(old_testimony_content_cn+new_testimony_content_cn)) 
@@ -910,6 +918,7 @@ class MyMainWindow(QMainWindow):
                 for i,each in enumerate(hit_books):
                     all_content_eng_ = self.bible_english_json[each][hit_chapters[i]]
                     all_content_eng.append('<{}>Chapter{}'.format(each,hit_chapters[i]))
+                    read_chapters_for_today.append(all_content_eng[-1])
                     for each_verse, each_scripture in all_content_eng_.items():
                         all_content_eng.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
                 self.textBrowser_bible.setText('\n\n\n'.join(all_content_eng)) 
@@ -918,11 +927,13 @@ class MyMainWindow(QMainWindow):
                 hit_books_new = [bible_book_english[bible_books.index(each)] for each in hit_books_new]
                 for i,each in enumerate(hit_books_old):
                     old_testimony_content_eng.append('<{}> Chapter{}'.format(each,hit_chapters_old[i]))
+                    read_chapters_for_today.append(old_testimony_content_eng[-1])
                     old_testimony_content_eng_ = self.bible_english_json[each][hit_chapters_old[i]]
                     for each_verse, each_scripture in old_testimony_content_eng_.items():
                         old_testimony_content_eng.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
                 for i,each in enumerate(hit_books_new):
                     new_testimony_content_eng.append('<{}> Chapter{}'.format(each,hit_chapters_new[i]))
+                    read_chapters_for_today.append(new_testimony_content_eng[-1])
                     new_testimony_content_eng_ = self.english_bible_json[each][hit_chapters_new[i]]
                     for each_verse, each_scripture in new_testimony_content_eng_.items():
                         new_testimony_content_eng.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
@@ -933,6 +944,7 @@ class MyMainWindow(QMainWindow):
                 for i,each in enumerate(hit_books):
                     all_content_cn_ = self.bible_chinese_json[each][hit_chapters[i]]
                     all_content_cn.append('《{}》第{}章'.format(each,hit_chapters[i]))
+                    read_chapters_for_today.append(all_content_cn[-1])
                     for each_verse, each_scripture in all_content_cn_.items():
                         all_content_cn.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
                 #english bible
@@ -955,11 +967,13 @@ class MyMainWindow(QMainWindow):
                 #chinese bible
                 for i,each in enumerate(hit_books_old):
                     old_testimony_content_cn.append('《{}》第{}章'.format(each,hit_chapters_old[i]))
+                    read_chapters_for_today.append(old_testimony_content_cn[-1])
                     old_testimony_content_cn_ = self.bible_chinese_json[each][hit_chapters_old[i]]
                     for each_verse, each_scripture in old_testimony_content_cn_.items():
                         old_testimony_content_cn.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
                 for i,each in enumerate(hit_books_new):
                     new_testimony_content_cn.append('《{}》第{}章'.format(each,hit_chapters_new[i]))
+                    read_chapters_for_today.append(new_testimony_content_cn[-1])
                     new_testimony_content_cn_ = self.bible_chinese_json[each][hit_chapters_new[i]]
                     for each_verse, each_scripture in new_testimony_content_cn_.items():
                         new_testimony_content_cn.append('{}.{}'.format(each_verse,each_scripture.rstrip()))
@@ -987,12 +1001,14 @@ class MyMainWindow(QMainWindow):
                     self.textBrowser_bible.setText(''.join(display_content)) 
                 except:
                     self.textBrowser_bible.setText('\n\n'.join(cn_content+eng_content)) 
+        self.statusbar.clearMessage()
+        self.statusbar.showMessage('+'.join(read_chapters_for_today))
 
     def get_scripture_for_today(self):
         books = []
         chapters = []
         method = self.reading_plan.rsplit("-")
-        print(method)
+        # print(method)
         self.speed = int(method[0])
         if len(method)==1:
             speed = int(method[0])
@@ -1042,7 +1058,7 @@ class MyMainWindow(QMainWindow):
                 return 'End'
             else:
                 pass
-        print('target_chapters',scope,target_chapters,speed,more)
+        # print('target_chapters',scope,target_chapters,speed,more)
         for i in range(num_nodes_book+1):
             current_book_length = len(self.html_overview.xpath("/html/body/div[2]/ul/div[{}]/ul/li".format(offset+i+1)))
             acc_chapters+= current_book_length
@@ -1067,7 +1083,7 @@ class MyMainWindow(QMainWindow):
                 else:
                     end_chapter_index.append(end_chapter_index_)
                 break
-        print(node_index,start_chapter_index,end_chapter_index) 
+        # print(node_index,start_chapter_index,end_chapter_index) 
         chapter_content = []
         for i in range(len(node_index)):
             each_node_index = node_index[i]
@@ -1097,28 +1113,13 @@ class MyMainWindow(QMainWindow):
         y,m,d = selected_date.year, selected_date.month, selected_date.day
         first_data_of_year = datetime.date(y,1,1)
         which_day_of_today = (selected_date - first_data_of_year).days
-        content = [self.desert_scripture['{}_cn'.format(which_day_of_today)],self.desert_scripture['{}_eng'.format(which_day_of_today)]]
-
-        '''
-        if self.html_overview_ds != "error":
-            url = self.html_overview_ds.xpath('/html/body/div[2]/div[4]/div[1]/div[2]/div[{}]/ul/li/a/@href'.format(int(m)*2))[int(d)-1]
-            sock = urllib.request.urlopen(url)
-            html = etree.HTML(sock.read())
-            sock.close()
-            content = html.xpath('/html/body/div[2]/div[4]/div/div[4]/div[2]/p/text()')
-        else:
+        try:
             content = [self.desert_scripture['{}_cn'.format(which_day_of_today)],self.desert_scripture['{}_eng'.format(which_day_of_today)]]
-        '''
-        self.plainTextEdit_desert.clear()
-        self.plainTextEdit_desert.setPlainText('\n'.join(content))
-        """
-        for each in content:
-            each=each+'\n\n\n'
-            cursor = self.textBrowser.textCursor()
-            cursor.insertHtml('''<p><span style="color: green;">{} <br></span>'''.format(each))
-        """
-        self.pushButton_before.click()
-        # self.textBrowser.setText('\n'.join(content))
+            self.plainTextEdit_desert.clear()
+            self.plainTextEdit_desert.setPlainText('\n'.join(content))
+            self.pushButton_before.click()
+        except:
+            pass
 
     #not in use any more
     def update_reading_plan_old(self):
