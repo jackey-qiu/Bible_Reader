@@ -48,6 +48,7 @@ from bible_book import *
 msg_path = locate_path.module_path_locator()
 analyzer = ChineseAnalyzer()
 # print(msg_path)
+desertscripture_path = str(Path(__file__).parent / 'scrapy_projects' / 'desertscripture' / 'desertscripture.json')
 
 def error_pop_up(msg_text = 'error', window_title = ['Error','Information','Warning'][0]):
     msg = QMessageBox()
@@ -138,14 +139,14 @@ class MyMainWindow(QMainWindow):
                            color: #3300CC;}""")
         self.plainTextEdit_desert.setStyleSheet(
                         """QPlainTextEdit {
-                           color: green;}""")
+                           color: gold;}""")
 
         self.plainTextEdit_scripture_explain.setStyleSheet(
                         """QPlainTextEdit {background-color: #FFFFFF;
                            color: #6600CC;}""")
         self.setWindowTitle('Bible Reader')
         self.html_overview_ds = 'error'
-        with open('/Users/canrongqiu/apps/Bible_Reader/scrapy_projects/desertscripture/desertscripture.json','r') as f:
+        with open(desertscripture_path,'r') as f:
             self.desert_scripture = json.load(f)
 
         self.html_scripture = "https://dailyverses.net/tc/"
