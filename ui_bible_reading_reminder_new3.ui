@@ -44,11 +44,6 @@
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QPushButton" name="pushButton_today">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>今日经文</string>
             </property>
@@ -56,11 +51,6 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_before">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>往日经文</string>
             </property>
@@ -68,11 +58,6 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_specified">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>指定经文</string>
             </property>
@@ -80,11 +65,6 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_check">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>今日打卡</string>
             </property>
@@ -92,11 +72,6 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_save_plan">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>保存计划</string>
             </property>
@@ -113,13 +88,8 @@
         </item>
         <item>
          <widget class="QTabWidget" name="tabWidget_2">
-          <property name="font">
-           <font>
-            <family>KaiTi</family>
-           </font>
-          </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_5">
            <attribute name="title">
@@ -210,7 +180,6 @@
            <widget class="QLabel" name="label">
             <property name="font">
              <font>
-              <family>KaiTi</family>
               <pointsize>16</pointsize>
              </font>
             </property>
@@ -244,7 +213,7 @@
           </property>
           <property name="font">
            <font>
-            <family>KaiTi</family>
+            <family>Songti SC</family>
             <pointsize>15</pointsize>
             <italic>false</italic>
            </font>
@@ -329,11 +298,6 @@
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <item>
            <widget class="QLabel" name="label_21">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -347,11 +311,6 @@
           </item>
           <item>
            <widget class="QCheckBox" name="checkBox_order">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>顺序读经</string>
             </property>
@@ -359,11 +318,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_3">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>《旧约》每日</string>
             </property>
@@ -391,11 +345,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_24">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>《新约》每日</string>
             </property>
@@ -423,11 +372,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_4">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>读经开始于</string>
             </property>
@@ -456,11 +400,6 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
             </property>
             <property name="text">
              <string>年</string>
@@ -521,11 +460,6 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>读完还需</string>
             </property>
@@ -555,11 +489,6 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>日</string>
             </property>
@@ -578,11 +507,6 @@
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QLabel" name="label_14">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>追加章数</string>
             </property>
@@ -590,11 +514,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_15">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>旧约</string>
             </property>
@@ -621,11 +540,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_16">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>新约</string>
             </property>
@@ -652,11 +566,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_9">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>按章提取</string>
             </property>
@@ -680,11 +589,6 @@
           </item>
           <item>
            <widget class="QLineEdit" name="lineEdit_book">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>创世记</string>
             </property>
@@ -692,11 +596,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_2">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>从</string>
             </property>
@@ -723,11 +622,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_12">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>至</string>
             </property>
@@ -761,11 +655,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_20">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>英文版本</string>
             </property>
@@ -821,11 +710,6 @@
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
            <widget class="QLabel" name="label_18">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>搜索字段</string>
             </property>
@@ -843,11 +727,6 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_search">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>搜索</string>
             </property>
@@ -855,11 +734,6 @@
           </item>
           <item>
            <widget class="QLabel" name="label_19">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>经文显示方式</string>
             </property>
@@ -867,11 +741,6 @@
           </item>
           <item>
            <widget class="QRadioButton" name="radioButton_cn">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>只显示中文</string>
             </property>
@@ -882,11 +751,6 @@
           </item>
           <item>
            <widget class="QRadioButton" name="radioButton_eng">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>只显示英文</string>
             </property>
@@ -894,11 +758,6 @@
           </item>
           <item>
            <widget class="QRadioButton" name="radioButton_cn_eng">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>中英对照显示</string>
             </property>
@@ -926,12 +785,12 @@
           </property>
           <property name="font">
            <font>
-            <family>KaiTi</family>
+            <family>.SF NS Text</family>
             <pointsize>13</pointsize>
            </font>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -942,7 +801,7 @@
              <widget class="QTextBrowser" name="textBrowser_bible">
               <property name="font">
                <font>
-                <family>KaiTi</family>
+                <family>Songti SC</family>
                 <pointsize>15</pointsize>
                </font>
               </property>
@@ -950,7 +809,7 @@
                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'KaiTi'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Songti SC'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Kai'; font-size:17pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
@@ -966,7 +825,7 @@ p, li { white-space: pre-wrap; }
              <widget class="QTextBrowser" name="textBrowser_search_results">
               <property name="font">
                <font>
-                <family>KaiTi</family>
+                <family>Songti SC</family>
                 <pointsize>15</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
@@ -976,7 +835,7 @@ p, li { white-space: pre-wrap; }
                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'KaiTi'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Songti SC'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Kai'; font-size:17pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
@@ -1156,7 +1015,7 @@ p, li { white-space: pre-wrap; }
                   </property>
                   <property name="font">
                    <font>
-                    <family>KaiTi</family>
+                    <family>Songti SC</family>
                     <pointsize>15</pointsize>
                    </font>
                   </property>
@@ -1505,11 +1364,6 @@ p, li { white-space: pre-wrap; }
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QPushButton" name="pushButton_load">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>查看所有笔记</string>
             </property>
@@ -1517,11 +1371,6 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_save">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>覆盖当天笔记</string>
             </property>
@@ -1529,11 +1378,6 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_append">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>追加当天笔记</string>
             </property>
@@ -1554,11 +1398,6 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QLabel" name="label_11">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
@@ -1585,11 +1424,6 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_show_notes">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>隐藏笔记</string>
             </property>
@@ -1597,11 +1431,6 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_show_scripture">
-            <property name="font">
-             <font>
-              <family>KaiTi</family>
-             </font>
-            </property>
             <property name="text">
              <string>隐藏经文</string>
             </property>
@@ -1628,7 +1457,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="font">
               <font>
-               <family>KaiTi</family>
+               <family>Songti TC</family>
                <pointsize>15</pointsize>
               </font>
              </property>
@@ -1652,7 +1481,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>21</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
