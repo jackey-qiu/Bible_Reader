@@ -43,7 +43,8 @@ try:
     from . import locate_path
 except:
     import locate_path
-import youtube_dl
+#import youtube_dl
+import yt_dlp as youtube_dl
 from bible_book import *
 msg_path = locate_path.module_path_locator()
 analyzer = ChineseAnalyzer()
@@ -208,6 +209,8 @@ class MyMainWindow(QMainWindow):
         self.listWidget_docs.itemDoubleClicked.connect(self.open_selected_doc_in_listWidget)
         self.pushButton_next_chapter.clicked.connect(self.go_to_next_chapter)
         self.pushButton_last_chapter.clicked.connect(self.go_to_last_chapter)
+        self.pushButton_clear_all.clicked.connect(self.clear_all_items_in_listWidget)
+        self.pushButton_new_chapter.clicked.connect(self.add_new_chapter_in_the_selected_book)
         ####qmediaplayer settings from this line on####
         self.player = QMediaPlayer()
         self.player.error.connect(self.erroralert)
@@ -238,6 +241,19 @@ class MyMainWindow(QMainWindow):
         self.pushButton_remove.clicked.connect(self.empty_files)
         self.pushButton_download.clicked.connect(self.download_file)
         self.setAcceptDrops(True)
+
+        #update terminal widget
+        self.widget_terminal.update_name_space('main_win',self)
+
+    def clear_all_items_in_listWidget(self):
+        self.listWidget_docs.clear()
+        self.lineEdit_book_title.clear()
+        self.comboBox_book_chapter.clear()
+        self.plainTextEdit_scripture_explain.clear()
+
+    def add_new_chapter_in_the_selected_book(self):
+        self.plainTextEdit_scripture_explain.setPlainText("这里开始编辑新章节内容，编辑完毕请点击保存按键！")
+        self.lineEdit_new_chapter.setText('请输入新章节名称')
 
     def open_selected_doc_in_listWidget(self):
         fileName = os.path.join(self.document_folder,self.listWidget_docs.currentItem().text())

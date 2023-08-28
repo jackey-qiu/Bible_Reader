@@ -790,7 +790,7 @@
            </font>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -885,6 +885,13 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="pushButton_clear_all">
+                <property name="text">
+                 <string>清空</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="label_22">
                 <property name="text">
                  <string>文件名</string>
@@ -909,13 +916,6 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_26">
-                <property name="text">
-                 <string>选取章节</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QComboBox" name="comboBox_book_chapter">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -933,7 +933,7 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_34">
+               <widget class="QPushButton" name="pushButton_new_chapter">
                 <property name="text">
                  <string>新建章节</string>
                 </property>
@@ -1348,6 +1348,16 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tab_7">
+           <attribute name="title">
+            <string>终端控制</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_20">
+            <item>
+             <widget class="TerminalWidget" name="widget_terminal" native="true"/>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
         <item>
@@ -1482,6 +1492,12 @@ p, li { white-space: pre-wrap; }
    <class>VideoWidget</class>
    <extends>QWidget</extends>
    <header>videowidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TerminalWidget</class>
+   <extends>QWidget</extends>
+   <header>terminal_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
